@@ -10,6 +10,7 @@ import Settings from './components/Settings';
 import FeedbackPanel from './components/FeedbackPanel';
 import Profile from './components/Profile';
 import { ensureUserExists } from './api/database';
+import { encryptData, decryptData } from './utils/crypto';
 
 export const UserContext = createContext();
 
@@ -51,7 +52,7 @@ function AuthBlock({ className }) {
                 const dbUser = await ensureUserExists(decoded);
                 const finalUser = { ...decoded, role: dbUser?.role || 'player' };
                 setUser(finalUser);
-                localStorage.setItem('user_profile', JSON.stringify(finalUser));
+                localStorage.setItem('user_profile', encryptData(finalUser));
               }}
               onError={() => {
                 console.log('Login Failed');
@@ -150,9 +151,27 @@ export default function App() {
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '尚未設定 Client ID';
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('user_profile');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
+    const savedUserStr = localStorage.getItem('user_profile');
+    if (savedUserStr) {
+      let userData = decryptData(savedUserStr);
+      
+      // 如果解密失敗，可能是舊版的明碼 JSON，嘗試直接解析
+      if (!userData) {
+        try {
+          userData = JSON.parse(savedUserStr);
+          // 解析成功後，順便把它轉成加密版本存回去
+          if (userData) {
+            localStorage.setItem('user_profile', encryptData(userData));
+          }
+        } catch (e) {
+          // 如果連 JSON 都不算，直接清空
+          localStorage.removeItem('user_profile');
+        }
+      }
+
+      if (userData) {
+        setUser(userData);
+      }
     }
   }, []);
 
