@@ -18,7 +18,7 @@ const isUserAdmin = (user) => {
   return user?.role === 'admin';
 };
 
-function AuthBlock({ className }) {
+function AuthBlock({ className, enableOneTap = false }) {
   const { user, setUser } = useContext(UserContext);
   const isAdmin = isUserAdmin(user);
 
@@ -57,7 +57,7 @@ function AuthBlock({ className }) {
               onError={() => {
                 console.log('Login Failed');
               }}
-              useOneTap
+              useOneTap={enableOneTap}
             />
           </div>
         </div>
@@ -101,7 +101,7 @@ function Nav() {
       </div>
       
       {/* 桌面版的登入區塊 (大於 md 顯示) */}
-      <AuthBlock className="hidden md:flex" />
+      <AuthBlock className="hidden md:flex" enableOneTap={true} />
     </nav>
   );
 }
