@@ -38,27 +38,33 @@ export default function AdminPanel() {
         v.type === '他動詞' && v.word === trData.kanji && v.hiragana === trData.hiragana
       ) : false;
 
-      // 嚴格的 AND 確認：
-      // 如果使用者同時輸入自動詞與他動詞，必須「兩者都已存在」才視為重複並阻擋。
-      // 如果只輸入其中一個，則只要該項目存在就阻擋。
+      // 嚴格的防呆機制：只要有任何一個輸入的詞已經存在，就直接阻擋並提示
       if (inData.kanji && trData.kanji) {
         if (inExists && trExists) {
-          setMessage({ type: 'error', text: '此自動詞與他動詞的組合已經存在於題庫中！' });
+          setMessage({ type: 'error', text: '此自動詞與他動詞皆已存在於題庫中！' });
+          setLoading(false);
+          return;
+        } else if (inExists) {
+          setMessage({ type: 'error', text: `自動詞【${inData.kanji}】已存在於題庫中，為避免混淆，請清除自動詞欄位後再單獨新增他動詞！` });
+          setLoading(false);
+          return;
+        } else if (trExists) {
+          setMessage({ type: 'error', text: `他動詞【${trData.kanji}】已存在於題庫中，為避免混淆，請清除他動詞欄位後再單獨新增自動詞！` });
           setLoading(false);
           return;
         }
       } else if (inData.kanji && inExists) {
-        setMessage({ type: 'error', text: `自動詞「${inData.kanji}」已存在！` });
+        setMessage({ type: 'error', text: `自動詞【${inData.kanji}】已存在！` });
         setLoading(false);
         return;
       } else if (trData.kanji && trExists) {
-        setMessage({ type: 'error', text: `他動詞「${trData.kanji}」已存在！` });
+        setMessage({ type: 'error', text: `他動詞【${trData.kanji}】已存在！` });
         setLoading(false);
         return;
       }
 
-      // 檢查通過，開始寫入
-      if (inData.kanji && !inExists) {
+      // 檢查完後，開始寫入 (此時保證輸入的項目都是新的)
+      if (inData.kanji) {
         await addVerb({
           word: inData.kanji,
           hiragana: inData.hiragana,
@@ -67,7 +73,7 @@ export default function AdminPanel() {
         });
       }
       
-      if (trData.kanji && !trExists) {
+      if (trData.kanji) {
         await addVerb({
           word: trData.kanji,
           hiragana: trData.hiragana,
