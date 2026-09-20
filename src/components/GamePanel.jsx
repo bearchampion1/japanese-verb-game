@@ -84,6 +84,19 @@ export default function GamePanel() {
     }
   };
 
+  // 當題目改變（或遊戲剛開始）時，自動發音
+  useEffect(() => {
+    if (gameStarted && !showResult && gameQueue.length > 0) {
+      const currentQ = gameQueue[currentIndex];
+      if (currentQ && currentQ.word) {
+        // 延遲一小段時間再發音，避免畫面還沒切換完就先出聲
+        setTimeout(() => {
+          playAudio(currentQ.word);
+        }, 100);
+      }
+    }
+  }, [currentIndex, gameStarted, showResult, gameQueue]);
+
   const handleAnswer = (answerType) => {
     if (answered) return;
     
