@@ -31,34 +31,34 @@ export default function AdminPanel() {
       const allVerbs = await fetchVerbs();
       
       const inExists = inData.kanji ? allVerbs.some(v => 
-        v.type === '自動詞' && v.word === inData.kanji && v.hiragana === inData.hiragana
+        v.type === '自動詞' && v.word === inData.kanji && v.hiragana === inData.hiragana && v.meaning === inData.meaning
       ) : false;
 
       const trExists = trData.kanji ? allVerbs.some(v => 
-        v.type === '他動詞' && v.word === trData.kanji && v.hiragana === trData.hiragana
+        v.type === '他動詞' && v.word === trData.kanji && v.hiragana === trData.hiragana && v.meaning === trData.meaning
       ) : false;
 
       // 嚴格的防呆機制：只要有任何一個輸入的詞已經存在，就直接阻擋並提示
       if (inData.kanji && trData.kanji) {
         if (inExists && trExists) {
-          setMessage({ type: 'error', text: '此自動詞與他動詞皆已存在於題庫中！' });
+          setMessage({ type: 'error', text: '此自動詞與他動詞 (包含相同意思) 皆已存在於題庫中！' });
           setLoading(false);
           return;
         } else if (inExists) {
-          setMessage({ type: 'error', text: `自動詞【${inData.kanji}】已存在於題庫中，為避免混淆，請清除自動詞欄位後再單獨新增他動詞！` });
+          setMessage({ type: 'error', text: `自動詞【${inData.kanji}】(意思: ${inData.meaning}) 已存在於題庫中，為避免混淆，請清除自動詞欄位後再單獨新增他動詞！` });
           setLoading(false);
           return;
         } else if (trExists) {
-          setMessage({ type: 'error', text: `他動詞【${trData.kanji}】已存在於題庫中，為避免混淆，請清除他動詞欄位後再單獨新增自動詞！` });
+          setMessage({ type: 'error', text: `他動詞【${trData.kanji}】(意思: ${trData.meaning}) 已存在於題庫中，為避免混淆，請清除他動詞欄位後再單獨新增自動詞！` });
           setLoading(false);
           return;
         }
       } else if (inData.kanji && inExists) {
-        setMessage({ type: 'error', text: `自動詞【${inData.kanji}】已存在！` });
+        setMessage({ type: 'error', text: `自動詞【${inData.kanji}】(意思: ${inData.meaning}) 已存在！` });
         setLoading(false);
         return;
       } else if (trData.kanji && trExists) {
-        setMessage({ type: 'error', text: `他動詞【${trData.kanji}】已存在！` });
+        setMessage({ type: 'error', text: `他動詞【${trData.kanji}】(意思: ${trData.meaning}) 已存在！` });
         setLoading(false);
         return;
       }
