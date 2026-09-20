@@ -91,7 +91,8 @@ export default function GamePanel() {
       if (currentQ && currentQ.word) {
         // 延遲一小段時間再發音，避免畫面還沒切換完就先出聲
         setTimeout(() => {
-          playAudio(currentQ.word);
+          // 改念平假名以確保發音正確
+          playAudio(currentQ.hiragana || currentQ.word);
         }, 100);
       }
     }
@@ -241,7 +242,7 @@ export default function GamePanel() {
             {currentQ.word}
           </div>
           <button 
-            onClick={() => playAudio(currentQ.word)}
+            onClick={() => playAudio(currentQ.hiragana || currentQ.word)}
             className="text-gray-400 hover:text-blue-500 transition-colors p-2 rounded-full hover:bg-gray-100"
             title="播放發音"
           >
