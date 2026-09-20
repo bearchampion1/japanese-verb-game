@@ -74,6 +74,16 @@ export default function GamePanel() {
     setShowResult(false);
   };
 
+  const playAudio = (text) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'ja-JP';
+      utterance.rate = 0.9; // 稍微放慢讓發音更清晰
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
   const handleAnswer = (answerType) => {
     if (answered) return;
     
@@ -212,9 +222,20 @@ export default function GamePanel() {
           key={currentQ.id}
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-5xl md:text-6xl font-bold"
+          className="flex items-center justify-center gap-3"
         >
-          {currentQ.word}
+          <div className="text-5xl md:text-6xl font-bold">
+            {currentQ.word}
+          </div>
+          <button 
+            onClick={() => playAudio(currentQ.word)}
+            className="text-gray-400 hover:text-blue-500 transition-colors p-2 rounded-full hover:bg-gray-100"
+            title="播放發音"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+            </svg>
+          </button>
         </motion.div>
       </div>
 
